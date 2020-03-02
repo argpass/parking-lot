@@ -10,9 +10,20 @@ parking_boys = [primary_parking_boy]
 parking_boy_repo: ParkingBoyRepo = ParkingBoyRepoInMem(parking_boys)
 
 
-def test_park_a_car_and_get_the_same_car_with_right_receipt():
+def test_park_cars_and_get_the_same_cars_with_right_receipts():
     parking_application = ParkingLotApplication(parking_boy_repo)
-    car = Car("川W888888")
-    receipt: Receipt = parking_application.park(ParkingCommand(primary_parking_boy.id, car.plate_number))
-    car_got = parking_application.get_car(GetCarCommand(receipt.token))
-    assert car == car_got
+    cars = [Car("川W8888%2d" % i) for i in range(10)]
+    receipts = []
+    cars_got = []
+
+    # parking
+    for car in cars:
+        receipt: Receipt = parking_application.park(ParkingCommand(primary_parking_boy.id, car.plate_number))
+        receipts.append(receipt)
+
+    # get cars
+    for receipt in receipts:
+        car_got = parking_application.get_car(GetCarCommand(receipt.token))
+        cars_got.append(car_got)
+
+    assert cars == cars_got
